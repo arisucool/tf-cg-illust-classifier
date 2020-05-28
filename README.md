@@ -2,6 +2,9 @@
 
 This model can be used in Keras or Tensorflow.js to classify images about Cinderella Girls into illustrations or others.
 
+Example: https://arisucool.github.io/tf-cg-illust-classifier/index.html
+
+
 ## Notes
 
 * This repository and model does not contain any copyright material (e.g, illustrations, photos).
