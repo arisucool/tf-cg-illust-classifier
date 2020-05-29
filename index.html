@@ -32,134 +32,85 @@
                 async init() {
 
                     // Set an event handler
-                    document.getElementById('imageFileChooser').addEventListener('change', (event) => {
+                    document.getElementById('imageFileChooser').addEventListener('change', async (event) => {
 
-                        this.loadImage(event.target.files[0]);
+                        await this.onChooseFile(event.target.files[0]);
 
                     }, false);
-
-                    console.log(tmImage);
 
                     // Load the model
                     this.model = await tmImage.load(this.MODEL_URL, this.METADATA_URL);
                     this.maxPredictions = this.model.getTotalClasses();
 
-                    // Generate an canvas
-                    this.canvas = document.createElement('canvas');
-                    this.canvas.width = 224;
-                    this.canvas.height = 224;
-                    this.ctx = this.canvas.getContext('2d');
+                }
+
+                async onChooseFile(file) {
+
+                    // Clear results
+                    this.clearResult();
+
+                    // Load the image
+                    let img = null;
+                    try {
+                        img = await this.loadImage(file);
+                    } catch (e) {
+                        window.alert(e);
+                    }
+
+                    if (img == null) {
+                        return;
+                    }
+
+                    // Show the image
+                    document.getElementById('choosedImage').src = img.src;
+
+                    // Show the result card
+                    document.getElementById('resultCard').style.display = 'block';
+
+                    // Classify
+                    const result = await this.classify(img);
+
+                    // Show results - Label
+                    document.getElementById('resultClassifiedLabel').innerText = result.classified.className;
+
+                    // Show results - Prediction
+                    const ul = document.getElementById('resultPredictionList');
+                    for (const pred of result.prediction) {
+                        const li = document.createElement('li');
+                        li.innerText = pred.className + ': ' + pred.probability;
+                        ul.appendChild(li);
+                    }
 
                 }
 
                 async loadImage(file) {
 
-                    // Clear results
-                    this.clearResult();
+                    return new Promise((resolve, reject) => {
 
-                    // Check the file type
-                    if (!file.type.match('image.*')) { // If not an image file
-                        return window.alert('Please choose image files.');
-                    }
+                        // Check the file type
+                        if (!file.type.match('image.*')) { // If not an image file
+                            return reject('Please choose image files.');
+                        }
 
-                    // Load the image file
-                    const reader = new FileReader();
-                    reader.onload = async () => {
+                        // Open the file
+                        const reader = new FileReader();
+                        reader.onload = async () => {
 
-                        //const img = document.createElement('img');
-                        //img.src = reader.result;
-                        const img = new Image();
-                        img.onload = async (event) => {
+                            // Load the file as an image
+                            const img = new Image();
+                            img.onload = async (event) => {
 
-                            // Resize and crop
-                            this.drawImageProp(this.ctx, img, 0, 0, 224, 224);
+                                // Return the image
+                                resolve(img);
 
-                            // Pre-process for classification
-                            tf.tidy(() => {
-
-                                let pixels = tf.browser.fromPixels(this.canvas);
-                                pixels = pixels.expandDims(0);
-
-                                // Normalize
-                                return pixels.toFloat().div(tf.scalar(127)).sub(tf.scalar(1));
-
-                            });
-
-                            // Show the image
-                            document.getElementById('choosedImage').src = this.canvas.toDataURL();
-
-                            // Show the result card
-                            document.getElementById('resultCard').style.display = 'block';
-
-                            // Classify
-                            const result = await this.classify();
-
-                            // Show results - Label
-                            document.getElementById('resultClassifiedLabel').innerText = result.classified.className;
-
-                            // Show results - Prediction
-                            const ul = document.getElementById('resultPredictionList');
-                            for (const pred of result.prediction) {
-                                const li = document.createElement('li');
-                                li.innerText = pred.className + ': ' + pred.probability;
-                                ul.appendChild(li);
-                            }
+                            };
+                            img.src = reader.result;
 
                         };
-                        img.src = reader.result;
+                        reader.readAsDataURL(file);
 
-                    };
-                    reader.readAsDataURL(file);
+                    });
 
-                }
-
-                // Thanks to https://stackoverflow.com/a/21961894
-                drawImageProp(ctx, img, x, y, w, h, offsetX, offsetY) {
-
-                    if (arguments.length === 2) {
-                        x = y = 0;
-                        w = ctx.canvas.width;
-                        h = ctx.canvas.height;
-                    }
-
-                    // default offset is center
-                    offsetX = typeof offsetX === "number" ? offsetX : 0.5;
-                    offsetY = typeof offsetY === "number" ? offsetY : 0.5;
-
-                    // keep bounds [0.0, 1.0]
-                    if (offsetX < 0) offsetX = 0;
-                    if (offsetY < 0) offsetY = 0;
-                    if (offsetX > 1) offsetX = 1;
-                    if (offsetY > 1) offsetY = 1;
-
-                    var iw = img.width,
-                        ih = img.height,
-                        r = Math.min(w / iw, h / ih),
-                        nw = iw * r,   // new prop. width
-                        nh = ih * r,   // new prop. height
-                        cx, cy, cw, ch, ar = 1;
-
-                    // decide which gap to fill
-                    if (nw < w) ar = w / nw;
-                    if (Math.abs(ar - 1) < 1e-14 && nh < h) ar = h / nh;  // updated
-                    nw *= ar;
-                    nh *= ar;
-
-                    // calc source rectangle
-                    cw = iw / (nw / w);
-                    ch = ih / (nh / h);
-
-                    cx = (iw - cw) * offsetX;
-                    cy = (ih - ch) * offsetY;
-
-                    // make sure source rectangle is valid
-                    if (cx < 0) cx = 0;
-                    if (cy < 0) cy = 0;
-                    if (cw > iw) cw = iw;
-                    if (ch > ih) ch = ih;
-
-                    // fill image in dest. rectangle
-                    ctx.drawImage(img, cx, cy, cw, ch,  x, y, w, h);
                 }
 
                 clearResult() {
@@ -175,9 +126,9 @@
 
                 }
 
-                async classify() {
+                async classify(img) {
 
-                    const prediction = await this.model.predict(this.canvas);
+                    const prediction = await this.model.predict(img);
 
                     let classified = null;
                     for (const pred of prediction) {
@@ -247,7 +198,7 @@
 
                         <!-- Choosed image -->
                         <p style="text-align: center;">
-                            <img id="choosedImage" style="width: 224px;">
+                            <img id="choosedImage" style="height: 224px;">
                         </p>
                         <!---->
 
