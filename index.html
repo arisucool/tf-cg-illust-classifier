@@ -17,7 +17,29 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
         <!---->
 
-        <!-- Example script -->
+        <!-- Stylesheet for Example -->
+        <style>
+
+            nav {
+                background-color: #4f4ba5;
+            }
+
+            footer.page-footer {
+                background: #4f4ba5;
+                bottom: 0px;
+                left: 0px;
+                padding-top: 0px;
+                position: fixed;
+                right: 0px;
+            }
+
+            footer.page-footer a {
+                color: white;
+            }
+
+        </style>
+
+        <!-- Script for Example -->
         <script type="text/javascript">
 
             class Example {
@@ -62,6 +84,7 @@
                     }
 
                     // Show the image
+                    document.getElementById('choosedImage').style.display = 'inline';
                     document.getElementById('choosedImage').src = img.src;
 
                     // Show the result card
@@ -164,10 +187,10 @@
     <body>
 
         <!-- Header -->
-        <nav class="light-blue lighten-2" role="navigation">
-          <div class="nav-wrapper container">
-              <a id="logo-container" href="https://github.com/arisucool/tf-cg-illust-classifier" class="brand-logo">tf-cg-illust-classifier</a>
-          </div>
+        <nav role="navigation">
+            <div class="nav-wrapper container" style="white-space: nowrap;">
+                <a id="logo-container" href="https://github.com/arisucool/tf-cg-illust-classifier" class="brand-logo">tf-cg-illust-classifier</a>
+            </div>
         </nav>
         <!---->
 
@@ -198,7 +221,7 @@
 
                         <!-- Choosed image -->
                         <p style="text-align: center;">
-                            <img id="choosedImage" style="height: 224px;">
+                            <img id="choosedImage" style="display: none; height: 224px;">
                         </p>
                         <!---->
 
@@ -224,5 +247,16 @@
             <!---->
 
         </div>
+
+        <!-- Footer -->
+        <footer class="page-footer">
+            <div class="footer-copyright">
+                <div class="container">
+                    <span class="right">&copy; <a href="https://github.com/arisucool/">arisu.cool 🍓 Project</a></span>
+                </div>
+            </div>
+        </footer>
+        <!---->
+
     </body>
 </html>
