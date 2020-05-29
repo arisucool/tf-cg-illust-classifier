@@ -11,6 +11,9 @@ Example: https://arisucool.github.io/tf-cg-illust-classifier/index.html
 
 * This model was generated for the purpose of extracting illustrations about Arisu. We don't guarantee that it is suitable for other idols.
 
+* Currently Limitations:
+
+    * Images of U149 official comics and シンデレラガールズ劇場 are classified as fan_illust.
 
 ## Classification labels
 
