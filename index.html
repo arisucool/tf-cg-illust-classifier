@@ -24,8 +24,8 @@
 
                 constructor() {
 
-                    this.MODEL_URL = 'tfjs/model.json';
-                    this.METADATA_URL = 'tfjs/metadata.json';
+                    this.MODEL_URL = 'tfjs/model.json?t=' + new Date().getTime();
+                    this.METADATA_URL = 'tfjs/metadata.json?t=' + new Date().getTime();
 
                 }
 
@@ -226,7 +226,7 @@
             <div class="col s12 m6">
                 <div class="card grey lighten-4">
                     <div class="card-content black-text">
-                        <span class="card-title">Let try classification</span>
+                        <span class="card-title">Let's try</span>
 
                         <p>
                             Please choose an image (e.g. illustration, screenshots, or photos) from your local file. <br />
